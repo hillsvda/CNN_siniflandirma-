@@ -1,41 +1,60 @@
-# Proje 1: Evrişimli Sinir Ağları (CNN) ile Görüntü Sınıflandırma
+# CNN ve Transfer Learning ile Görüntü Sınıflandırma Projesi 
 
-Bu proje, Makine Öğrenmesi dersi kapsamında, derin öğrenme yöntemleri kullanılarak görüntü sınıflandırma modellerinin geliştirilmesi, eğitilmesi ve performanslarının karşılaştırılması amacıyla hazırlanmıştır.
+Bu proje, **Derin Öğrenme (Deep Learning)** yöntemlerini kullanarak kişisel eşyaları (**Cüzdan** ve **Fare**) sınıflandırmak amacıyla geliştirilmiştir. Proje kapsamında üç farklı model mimarisi (Transfer Learning, Temel CNN ve Geliştirilmiş CNN) tasarlanmış, eğitilmiş ve performansları karşılaştırılmıştır.
 
-## 📂 Proje İçeriği ve Dosya Yapısı
+## Proje Hakkında
+Bu çalışmanın temel amacı, kısıtlı bir veri seti üzerinde farklı CNN mimarilerinin performansını analiz etmek ve hiperparametre optimizasyonu ile model başarısını artırmaktır.
 
-Bu klasör, proje kapsamında geliştirilen 3 farklı modeli ve eğitimde kullanılan veri setini içerir:
+Proje 3 aşamadan oluşmaktadır:
+1.  **Model 1 (Transfer Learning):** VGG16 mimarisi kullanılarak özellik çıkarımı yapılmıştır.
+2.  **Model 2 (Basic CNN):** Sıfırdan basit bir CNN modeli eğitilmiştir.
+3.  **Model 3 (Optimized CNN):** Model 2 geliştirilerek, veri artırma (data augmentation) ve hiperparametre optimizasyonu ile en yüksek başarı hedeflenmiştir.
 
-```text
-Proje_1_CNN_Siniflandirma/
-│
-├── dataset/                # Eğitim ve test için kullanılan görüntüler
-│   ├── [Sınıf_1_Adı]/      # Örn: mouse
-│   └── [Sınıf_2_Adı]/      # Örn: cüzdan
-│
-├── model1.ipynb            # Model 1: Temel CNN Modeli
-├── model2.ipynb            # Model 2: Veri Artırma (Data Augmentation) Uygulanmış Model
-├── model3.ipynb            # Model 3: Transfer Learning (VGG16/ResNet) Modeli
-└── README.md               # Proje dökümantasyonu
-Proje kapsamında performans artışını gözlemlemek amacıyla adım adım üç farklı yaklaşım uygulanmıştır:
+---
 
-1. Model 1: Temel CNN (Baseline)
-Amaç: Sıfırdan basit bir Evrişimli Sinir Ağı (Convolutional Neural Network) mimarisi kurarak temel başarım skorunu elde etmek.
+# Veri Seti
+* **Sınıflar:** Cüzdan (Wallet) ve Fare (Mouse).
+* **Görüntü Boyutu:** 64x64 piksel.
+* **Kaynak:** Veri seti proje kapsamında özgün olarak oluşturulmuştur.
+* **Ön İşleme:** Görüntüler normalize edilmiş (0-1 aralığına çekilmiş) ve yeniden boyutlandırılmıştır.
 
-Mimari: Conv2D, MaxPooling2D, Flatten ve Dense katmanlarından oluşan standart yapı.
+---
 
-Sonuç: Veri seti küçük olduğu için bu modelde [Aşırı Öğrenme (Overfitting) gözlemlendi / Düşük başarı elde edildi].
+## 🧠 Modeller ve Mimariler
 
-2. Model 2: Veri Artırma (Data Augmentation)
-Amaç: Veri setindeki görüntü sayısının azlığından kaynaklanan ezberleme (overfitting) sorununu çözmek.
+### 1. Model 1: VGG16 (Transfer Learning)
+* **Mimari:** ImageNet ağırlıklarıyla eğitilmiş VGG16 modeli kullanıldı.
+* **Yöntem:** Konvolüsyon katmanları donduruldu (Frozen Layers), sadece sınıflandırma katmanı eğitildi.
+* **Sonuç:** Hızlı eğitim sağladı ancak veri seti boyutu küçük olduğu için %70 civarında başarıda kaldı.
 
-Yöntem: ImageDataGenerator kullanılarak mevcut görüntüler döndürme, yakınlaştırma ve kaydırma işlemleriyle çoğaltıldı. Dropout katmanları eklendi.
+### 2. Model 2: Temel CNN (Baseline)
+* **Mimari:** 2 Konvolüsyon Bloğu (32 ve 64 Filtre).
+* **Eksiklik:** Model kapasitesi düşük olduğu ve veri artırma uygulanmadığı için "Overfitting" (Ezberleme) sorunları yaşandı veya öğrenme yetersiz kaldı.
+* **Başarı:** ~%50 (Rastgele tahmin seviyesi).
 
-Sonuç: Modelin genelleme yeteneği artırıldı.
+### 3. Model 3: Geliştirilmiş CNN  
+Model 2 üzerinde şu kritik **hiperparametre değişiklikleri** yapılarak optimize edilmiştir:
+* **Filtre Sayısı Artırıldı:** 32, 64 -> **64, 128, 256** (Daha derin özellik çıkarımı).
+* **Katman Eklendi:** Model derinleştirildi.
+* **Dropout Eklendi:** Ezberlemeyi (Overfitting) önlemek için **0.4** oranında Dropout eklendi.
+* **Learning Rate (Öğrenme Oranı):** 0.001 yerine **0.0005** kullanılarak daha hassas öğrenme sağlandı.
+* **Data Augmentation:** Veri seti yapay olarak çoğaltıldı (Döndürme, Kaydırma, Aynalama).
 
-3. Model 3: Transfer Learning (Transfer Öğrenme)
-Amaç: Çok az veri ile yüksek başarı elde etmek için önceden eğitilmiş (pre-trained) güçlü bir model kullanmak.
+---
 
-Yöntem: ImageNet veri seti üzerinde eğitilmiş [VGG16 / ResNet50 / MobileNet - Hangisini kullandıysan yaz] modelinin ağırlıkları kullanıldı. Son sınıflandırma katmanları kendi veri setimize göre uyarlandı.
+## 📊 Performans Karşılaştırması
 
-Sonuç: En yüksek doğruluk oranı ve en kararlı eğitim bu modelde elde edildi.
+| Model | Mimari Tipi | Doğruluk (Accuracy) | Durum |
+| :--- | :--- | :--- | :--- |
+| **Model 1** | VGG16 (Transfer Learning) | %70.00 | Orta Başarı |
+| **Model 2** | Basit CNN | %50.00 | Başarısız |
+| **Model 3** | **Geliştirilmiş CNN** | **%90.00** | En İyi Sonuç  |
+
+---
+
+## 🛠️ Kurulum ve Gereksinimler
+
+Projeyi yerel makinenizde çalıştırmak için aşağıdaki kütüphanelerin yüklü olması gerekmektedir:
+
+```bash
+pip install tensorflow keras numpy matplotlib pandas opencv-python
